@@ -18,7 +18,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path and path[0] == "sheets":
             # we're trying to find a character sheet
             if len(path) <= 1:
-                data = character_sheets
+                data = [{"id": id, "name": character_sheets[id]} for id in character_sheets]
                 # we serve the sheet selection page
             else:
                 if path[1] not in character_sheets:
