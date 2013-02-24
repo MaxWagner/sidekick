@@ -54,21 +54,23 @@ def parse_sheet(sheetname):
         char["Name"] = line.strip("# ")
         line = getline(fd)
         while line != '':
-            header = line.strip("# ")
+            header = line.strip("# \n")
             line = getline(fd)
             lines = []
             while not line.startswith('## ') and line != '':
-                lines.append(line)
+                lines.append(line.strip('\n'))
                 line = getline(fd)
             if len(lines) == 0:
                 break
             try:
+                print("::trying to find module",header.lower())
                 module = __import__(header.lower())
-                cl = getattr(module, header.lower())
+                print("::module found!")
+                parse_fn = module.parse
             except Exception:
                 print("could not find specific parser -- using generic one")
-                cl = generic.parser
-            char[header.lower()] = cl.parse(lines)
+                parse_fn = generic.parse
+            char[header.lower()] = parse_fn(lines)
     return char
 
         
