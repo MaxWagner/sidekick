@@ -30,6 +30,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     # 404, I hope super() knows what to do
                     return super().do_GET()
         else:
+            self.path = "/assets" + self.path
             # obviously looking for something else entirely
             return super().do_GET()
         self.send_response(200)
