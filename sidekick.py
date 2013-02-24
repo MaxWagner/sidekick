@@ -3,8 +3,9 @@
 from urllib.parse import urlparse
 import http.server
 import json
+import sys
 import os
-import generic
+import datahandlers.generic
 
 PORT = 8080
 character_sheets = []
@@ -69,12 +70,13 @@ def parse_sheet(sheetname):
                 break
             try:
                 print("::trying to find module",header.lower())
-                module = __import__(header.lower())
+                namespace = __import__("datahandlers." + header.lower())
+                module = getattr(namespace,header.lower())
                 print("::module found!")
                 parse_fn = module.parse
             except Exception:
-                print("could not find specific parser -- using generic one")
-                parse_fn = generic.parse
+                print("could not find specific parser -- using generic one", file=sys.stderr)
+                parse_fn = datahandlers.generic.parse
             char[header.lower()] = parse_fn(lines)
     return char
 
