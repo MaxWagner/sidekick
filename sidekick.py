@@ -7,7 +7,7 @@ import sys
 import os
 import datahandlers.generic
 
-PORT = 8080
+port = 8080
 character_sheets = []
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -85,8 +85,8 @@ def parse_sheet(sheetname):
 if __name__ == "__main__":
     update_character_sheets()
     try:
-        server = http.server.HTTPServer(('',PORT),Handler)
-        print("Server started on port", PORT)
+        server = http.server.HTTPServer(('',port),Handler)
+        print("Server started on port", port)
         server.serve_forever()
     except KeyboardInterrupt:
         print("Server shutting down")
