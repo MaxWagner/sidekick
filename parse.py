@@ -17,8 +17,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if path[0] == "sheets":
             # we're trying to find a character sheet
             if len(path) <= 1:
+                data = character_sheets
                 # we serve the sheet selection page
-                pass
             else:
                 if path[1] not in character_sheets:
                     update_character_sheets()
@@ -34,8 +34,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type','application/json')
         self.end_headers()
-        d = data
-        self.wfile.write(json.dumps(d).encode())
+        self.wfile.write(json.dumps(data).encode())
         return
 
 def update_character_sheets():
