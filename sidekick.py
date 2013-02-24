@@ -37,16 +37,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode())
         return
 
+
+def getline(fd):
+    line = fd.readline()
+    while line == '\n' and line != '':
+        line = fd.readline()
+    return line
+
 def update_character_sheets():
     global character_sheets
-    character_sheets = os.listdir('data')
+    dirlist = os.listdir('data')
+    character_sheets = {}
+    for cs in dirlist:
+        with open(''.join(['data/',cs]),'r') as fd:
+            character_sheets[cs] = getline(fd).strip('# \n')
 
 def parse_sheet(sheetname):
-    def getline(fd):
-        line = fd.readline()
-        while line == '\n' and line != '':
-            line = fd.readline()
-        return line
     char = {}
     with open(''.join(["data/",sheetname]),'r') as fd:
         line = getline(fd)
