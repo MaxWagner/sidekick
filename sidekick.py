@@ -9,12 +9,12 @@ import generic
 PORT = 8080
 character_sheets = []
 
-class Handler(http.server.BaseHTTPRequestHandler):
+class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        path = urlparse(self.path).path.split("/")[1:]
+        path = urlparse(self.path).path.rstrip("/").split("/")[1:]
         # path is the requested file path, as list
         data = {}
-        if path[0] == "sheets":
+        if path and path[0] == "sheets":
             # we're trying to find a character sheet
             if len(path) <= 1:
                 data = character_sheets
@@ -26,11 +26,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 if path[1] in character_sheets:
                     data = parse_sheet(path[1])
                 else:
-                    # 404
-                    self.send_response(404)
-                    self.end_headers()
-                    return
-
+                    # 404, I hope super() knows what to do
+                    return super().do_GET()
+        else:
+            # obviously looking for something else entirely
+            return super().do_GET()
         self.send_response(200)
         self.send_header('Content-type','application/json')
         self.end_headers()
@@ -49,12 +49,12 @@ def update_character_sheets():
     dirlist = os.listdir('data')
     character_sheets = {}
     for cs in dirlist:
-        with open(''.join(['data/',cs]),'r') as fd:
+        with open('data/' + cs,'r') as fd:
             character_sheets[cs] = getline(fd).strip('# \n')
 
 def parse_sheet(sheetname):
     char = {}
-    with open(''.join(["data/",sheetname]),'r') as fd:
+    with open("data/" + sheetname,'r') as fd:
         line = getline(fd)
         char["name"] = line.strip("# ")
         line = getline(fd)
