@@ -1,44 +1,42 @@
 #!/usr/bin/env python
 
 from urllib.parse import urlparse
-import http.server
-import json
+from bottle import route, run, request, static_file
 import sys
 import os
 import datahandlers.generic
 
 port = 8080
 character_sheets = []
+@route('/sheets', method='GET')
+def get_listing():
+    return {"sheets": [{"id": id, "name": character_sheets[id]} for id in character_sheets]}
 
-class Handler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        path = urlparse(self.path).path.rstrip("/").split("/")[1:]
-        # path is the requested file path, as list
-        data = {}
-        if path and path[0] == "sheets":
-            # we're trying to find a character sheet
-            if len(path) <= 1:
-                data = [{"id": id, "name": character_sheets[id]} for id in character_sheets]
-                # we serve the sheet selection page
-            else:
-                if path[1] not in character_sheets:
-                    update_character_sheets()
-                    print("found {0} character sheets".format(len(character_sheets)))
-                if path[1] in character_sheets:
-                    data = parse_sheet(path[1])
-                else:
-                    # 404, I hope super() knows what to do
-                    return super().do_GET()
-        else:
-            self.path = "/assets" + self.path
-            # obviously looking for something else entirely
-            return super().do_GET()
-        self.send_response(200)
-        self.send_header('Content-type','application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode())
-        return
+@route('/sheets/<id>', method='GET')
+def get_sheet(id=""):
+    """Return a listing of available character sheets or, if requested, a specific sheet in JSON format"""
+    if id:
+        # fetch the character sheet
+        if id not in character_sheets:
+            print("Character sheet not found. Updating...")
+            update_character_sheets()
+            print("Found {0} character sheets.".format(len(character_sheets)))
+        if id in character_sheets:
+            return {id: parse_sheet(id)}
+    else:
+        return get_listing()
 
+@route('/', method='GET')
+def get_root():
+    return get_asset("/index.html")
+
+@route('/<asset>', method='GET')
+def get_asset(asset=""):
+    try:
+        return static_file(asset, "assets")
+    except:
+        print("WDKHDLK")
+        abort(404, "Sorry, file not found")
 
 def getline(fd):
     line = fd.readline()
@@ -84,10 +82,4 @@ def parse_sheet(sheetname):
         
 if __name__ == "__main__":
     update_character_sheets()
-    try:
-        server = http.server.HTTPServer(('',port),Handler)
-        print("Server started on port", port)
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print("Server shutting down")
-        server.socket.close()
+    run(host='localhost', port=port)
