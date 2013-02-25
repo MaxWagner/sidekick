@@ -30,7 +30,7 @@ def get_sheet(id=""):
 def get_root():
     return get_asset("/index.html")
 
-@route('/<asset>', method='GET')
+@route('/<asset:path>', method='GET')
 def get_asset(asset=""):
     try:
         return static_file(asset, "assets")
