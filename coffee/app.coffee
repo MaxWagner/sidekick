@@ -10,8 +10,6 @@ App.Router.map ->
 App.IndexRoute = Ember.Route.extend
 	redirect: -> @transitionTo 'sheets'
 
-App.SheetsController = Ember.ArrayController
-
 App.SheetsRoute = Ember.Route.extend
 	setupController: (controller) ->
 		$.get 'sheets', (data) ->
