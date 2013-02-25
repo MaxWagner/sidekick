@@ -10,11 +10,12 @@ port = 8080
 character_sheets = []
 @route('/sheets', method='GET')
 def get_listing():
+    """Return a listing of available character sheets in JSON format"""
     return {"sheets": [{"id": id, "name": character_sheets[id]} for id in character_sheets]}
 
 @route('/sheets/<id>', method='GET')
 def get_sheet(id=""):
-    """Return a listing of available character sheets or, if requested, a specific sheet in JSON format"""
+    """Return a specific sheet in JSON format"""
     if id:
         # fetch the character sheet
         if id not in character_sheets:
@@ -22,16 +23,19 @@ def get_sheet(id=""):
             update_character_sheets()
             print("Found {0} character sheets.".format(len(character_sheets)))
         if id in character_sheets:
+            # We need to wrap this into another object to prevent certain vulnerabilities
             return {"sheet": parse_sheet(id)}
     else:
         return get_listing()
 
 @route('/', method='GET')
 def get_root():
+    """Serve the index.html"""
     return get_asset("/index.html")
 
 @route('/<asset:path>', method='GET')
 def get_asset(asset=""):
+    """Serve assets located in the "assets" folder by redirecting all requests there"""
     try:
         return static_file(asset, "assets")
     except:
@@ -39,12 +43,14 @@ def get_asset(asset=""):
         abort(404, "Sorry, file not found")
 
 def getline(fd):
+    """Fetch a non-empty line from an (open) file"""
     line = fd.readline()
     while line == '\n' and line != '':
         line = fd.readline()
     return line
 
 def update_character_sheets():
+    """Look for character sheets in the 'data' folder"""
     global character_sheets
     dirlist = os.listdir('data')
     character_sheets = {}
