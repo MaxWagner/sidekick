@@ -20,10 +20,21 @@
 <body>
 	<script type="text/x-handlebars" data-template-name="sheets">
 		<ul>
-			{{#each controller}}
-				<li>{{name}}</li>
+			{{#each sheet in controller}}
+				<li>{{#linkTo sheet sheet}}{{sheet.name}}{{/linkTo}}</li>
 			{{/each}}
 		</ul>
+	</script>
+	<script type="text/x-handlebars" data-template-name="sheet">
+		{{#with stats}}
+			<section>
+				<h1>Stats</h1>
+				<p>ST {{ST}}</p>
+				<p>DX {{DX}}</p>
+				<p>IQ {{IQ}}</p>
+				<p>HT {{HT}}</p>
+			</section>
+		{{/with}}
 	</script>
 
 	<script src="js/libs/jquery-1.9.1.min.js"></script>
