@@ -22,7 +22,7 @@ def get_sheet(id=""):
             update_character_sheets()
             print("Found {0} character sheets.".format(len(character_sheets)))
         if id in character_sheets:
-            return {id: parse_sheet(id)}
+            return {"sheet": parse_sheet(id)}
     else:
         return get_listing()
 
