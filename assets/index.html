@@ -20,8 +20,8 @@
 <body>
 	<script type="text/x-handlebars" data-template-name="sheets">
 		<ul>
-			{{#each sheet in sheets}}
-				<li>{{#linkTo sheet sheet}}{{sheet.name}}{{/linkTo}}</li>
+			{{#each sheets}}
+				<li>{{#linkTo sheet this}}{{name}}{{/linkTo}}</li>
 			{{/each}}
 		</ul>
 	</script>
