@@ -88,4 +88,4 @@ def parse_sheet(sheetname):
         
 if __name__ == "__main__":
     update_character_sheets()
-    run(host='localhost', port=port)
+    run(host='0.0.0.0', port=port)
