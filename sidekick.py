@@ -38,6 +38,11 @@ def put_sheet(id):
             abort(400, "Bad Request")
     dump_sheet(data)
 
+@route('/sheets/<id>', method='DELETE')
+def delete_sheet(id):
+    """Delete a character sheet"""
+    os.remove('data/' + id)
+
 @route('/', method='GET')
 def get_root():
     """Serve the index.html"""
@@ -69,22 +74,25 @@ def update_character_sheets():
 
 def parse_sheet(sheetname):
     char = {}
-    with open("data/" + sheetname,'r') as fd:
-        line = getline(fd)
-        char["name"] = line.strip("# ")
-        line = getline(fd)
-        while line != '':
-            header = line.strip("# \n")
+    try:
+        with open("data/" + sheetname,'r') as fd:
             line = getline(fd)
-            lines = []
-            while not line.startswith('## ') and line != '':
-                lines.append(line.strip('\n'))
+            char["name"] = line.strip("# ")
+            line = getline(fd)
+            while line != '':
+                header = line.strip("# \n")
                 line = getline(fd)
-            if len(lines) == 0:
-                break
-            parse_fn = get_func(header.lower(), "parse")
-            char[header.lower()] = parse_fn(lines)
-    return char
+                lines = []
+                while not line.startswith('## ') and line != '':
+                    lines.append(line.strip('\n'))
+                    line = getline(fd)
+                if len(lines) == 0:
+                    break
+                parse_fn = get_func(header.lower(), "parse")
+                char[header.lower()] = parse_fn(lines)
+        return char
+    except IOError:
+        abort(404, "File not found")
 
 def get_func(module_name, func_name):
     try:
