@@ -24,7 +24,7 @@ def get_sheet(id=""):
             print("Found {0} character sheets.".format(len(character_sheets)))
         if id in character_sheets:
             # We need to wrap this into another object to prevent certain vulnerabilities
-            return {"sheet": parse_sheet(id)}
+            return {"sheet": parse_sheet(id), "id": id}
     else:
         return get_listing()
 
@@ -39,7 +39,6 @@ def get_asset(asset=""):
     try:
         return static_file(asset, "assets")
     except:
-        print("WDKHDLK")
         abort(404, "Sorry, file not found")
 
 def getline(fd):
