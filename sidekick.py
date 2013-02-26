@@ -72,19 +72,24 @@ def parse_sheet(sheetname):
                 line = getline(fd)
             if len(lines) == 0:
                 break
-            try:
-                print("::trying to find module",header.lower())
-                namespace = __import__("datahandlers." + header.lower())
-                module = getattr(namespace,header.lower())
-                print("::module found!")
-                parse_fn = module.parse
-            except Exception:
-                print("could not find specific parser -- using generic one", file=sys.stderr)
-                parse_fn = datahandlers.generic.parse
+            parse_fn = get_func(header.lower(), "parse")
             char[header.lower()] = parse_fn(lines)
     return char
 
-        
+def get_func(module_name, func_name):
+    try:
+        print("::trying to find module", module_name)
+        namespace = __import__("datahandlers." + module_name)
+        module = getattr(namespace, module_name)
+        print("::module found!")
+        return getattr(module, func_name)
+    except Exception:
+        print("::could not find specific implementation -- using generic one", file=sys.stderr)
+        return getattr(datahandlers.generic, func_name)
+
+def capitalize_words(string):
+    return ' '.join([s.capitalize() for s in string.split()])
+
 if __name__ == "__main__":
     update_character_sheets()
     run(host='0.0.0.0', port=port)
