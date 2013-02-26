@@ -90,6 +90,22 @@ def get_func(module_name, func_name):
 def capitalize_words(string):
     return ' '.join([s.capitalize() for s in string.split()])
 
+def generate_sheet(data):
+    sheet = data["sheet"] # unwrap sheet
+    sheet_text = ["# " + capitalize_words(sheet["name"]) + '\n\n']
+    for key in sheet:
+        if key != "name":
+            sheet_text.append('## ' + capitalize_words(key) + '\n\n')
+            gen_fn = get_func(key, "generate")
+            sheet_text.append(gen_fn(sheet[key]))
+    return ''.join(sheet_text)
+
+def dump_sheet(data):
+    sheet_text = generate_sheet(data)
+    with open("data/" + data["id"], 'w') as fd:
+        fd.write(sheet_text)
+        print("::file", data["id"], "successfully written")
+
 if __name__ == "__main__":
     update_character_sheets()
     run(host='0.0.0.0', port=port)
