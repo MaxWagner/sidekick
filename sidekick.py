@@ -13,6 +13,7 @@ character_sheets = []
 @route('/sheets', method='GET')
 def get_listing():
     """Return a listing of available character sheets in JSON format"""
+    update_character_sheets()
     return {"sheets": [{"id": id, "name": character_sheets[id]} for id in character_sheets]}
 
 
@@ -47,6 +48,7 @@ def put_sheet(id):
 def delete_sheet(id):
     """Delete a character sheet"""
     os.remove('data/' + id)
+    del character_sheets[id]
 
 
 @route('/', method='GET')
