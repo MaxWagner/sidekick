@@ -8,10 +8,13 @@ import datahandlers.generic
 
 port = 8080
 character_sheets = []
+
+
 @route('/sheets', method='GET')
 def get_listing():
     """Return a listing of available character sheets in JSON format"""
     return {"sheets": [{"id": id, "name": character_sheets[id]} for id in character_sheets]}
+
 
 @route('/sheets/<id>', method='GET')
 def get_sheet(id=""):
@@ -28,6 +31,7 @@ def get_sheet(id=""):
     else:
         return get_listing()
 
+
 @route('/sheets/<id>', method='PUT')
 def put_sheet(id):
     """Parse and save a JSON object under the given id"""
@@ -38,15 +42,18 @@ def put_sheet(id):
             abort(400, "Bad Request")
     dump_sheet(data)
 
+
 @route('/sheets/<id>', method='DELETE')
 def delete_sheet(id):
     """Delete a character sheet"""
     os.remove('data/' + id)
 
+
 @route('/', method='GET')
 def get_root():
     """Serve the index.html"""
     return get_asset("/index.html")
+
 
 @route('/<asset:path>', method='GET')
 def get_asset(asset=""):
@@ -56,6 +63,7 @@ def get_asset(asset=""):
     except:
         abort(404, "Sorry, file not found")
 
+
 def getline(fd):
     """Fetch a non-empty line from an (open) file"""
     line = fd.readline()
@@ -63,19 +71,21 @@ def getline(fd):
         line = fd.readline()
     return line
 
+
 def update_character_sheets():
     """Look for character sheets in the 'data' folder"""
     global character_sheets
     dirlist = os.listdir('data')
     character_sheets = {}
     for cs in dirlist:
-        with open('data/' + cs,'r') as fd:
+        with open('data/' + cs, 'r') as fd:
             character_sheets[cs] = getline(fd).strip('# \n')
+
 
 def parse_sheet(sheetname):
     char = {}
     try:
-        with open("data/" + sheetname,'r') as fd:
+        with open("data/" + sheetname, 'r') as fd:
             line = getline(fd)
             char["name"] = line.strip("# ")
             line = getline(fd)
@@ -94,6 +104,7 @@ def parse_sheet(sheetname):
     except IOError:
         abort(404, "File not found")
 
+
 def get_func(module_name, func_name):
     try:
         print("::trying to find module", module_name)
@@ -105,12 +116,14 @@ def get_func(module_name, func_name):
         print("::could not find specific implementation -- using generic one", file=sys.stderr)
         return getattr(datahandlers.generic, func_name)
 
+
 def capitalize_words(string):
     """Capitalize a string word by word"""
     return ' '.join([s.capitalize() for s in string.split()])
 
+
 def generate_sheet(data):
-    sheet = data["sheet"] # unwrap sheet
+    sheet = data["sheet"]  # unwrap sheet
     sheet_text = ["# " + capitalize_words(sheet["name"]) + '\n\n']
     for key in sheet:
         if key != "name":
@@ -119,11 +132,13 @@ def generate_sheet(data):
             sheet_text.append(gen_fn(sheet[key]))
     return ''.join(sheet_text)
 
+
 def dump_sheet(data):
     sheet_text = generate_sheet(data)
     with open("data/" + data["id"], 'w') as fd:
         fd.write(sheet_text)
         print("::file", data["id"], "successfully written")
+
 
 if __name__ == "__main__":
     update_character_sheets()
