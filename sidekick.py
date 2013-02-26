@@ -28,6 +28,16 @@ def get_sheet(id=""):
     else:
         return get_listing()
 
+@route('/sheets/<id>', method='PUT')
+def put_sheet(id):
+    """Parse and save a JSON object under the given id"""
+    if id:
+        data = request.json
+        print(data)
+        if not data:
+            abort(400, "Bad Request")
+    dump_sheet(data)
+
 @route('/', method='GET')
 def get_root():
     """Serve the index.html"""
@@ -88,6 +98,7 @@ def get_func(module_name, func_name):
         return getattr(datahandlers.generic, func_name)
 
 def capitalize_words(string):
+    """Capitalize a string word by word"""
     return ' '.join([s.capitalize() for s in string.split()])
 
 def generate_sheet(data):
