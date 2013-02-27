@@ -89,7 +89,7 @@ def parse_sheet(sheetname):
     try:
         with open("data/" + sheetname, 'r') as fd:
             line = getline(fd)
-            char["name"] = line.strip("# ")
+            char["name"] = line.strip("# \n")
             line = getline(fd)
             while line != '':
                 header = line.strip("# \n")

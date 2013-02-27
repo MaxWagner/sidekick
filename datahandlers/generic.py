@@ -2,7 +2,7 @@
 
 
 def parse(lines):
-    return '\n'.join(lines)
+    return lines
 
 
 def generate(json):
