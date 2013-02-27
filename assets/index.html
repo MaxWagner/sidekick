@@ -29,12 +29,16 @@
 		{{#with stats}}
 			<section>
 				<h1>Stats</h1>
-				<p>ST {{ST}}</p>
-				<p>DX {{DX}}</p>
-				<p>IQ {{IQ}}</p>
-				<p>HT {{HT}}</p>
+				<p>ST {{view App.SuccessRollView targetBinding=st}}</p>
+				<p>DX {{view App.SuccessRollView targetBinding=dx}}</p>
+				<p>IQ {{view App.SuccessRollView targetBinding=iq}}</p>
+				<p>HT {{view App.SuccessRollView targetBinding=ht}}</p>
 			</section>
 		{{/with}}
+	</script>
+
+	<script type="text/x-handlebars" data-template-name="success-roll">
+		{{view.target}} - <span {{bindAttr style=view.successStyle}}>{{view.successRate}}</span>
 	</script>
 
 	<script src="js/libs/jquery-1.9.1.min.js"></script>

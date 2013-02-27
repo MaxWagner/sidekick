@@ -1,6 +1,8 @@
 App = Ember.Application.create
 	LOG_TRANSITIONS: true
 
+window.App = App
+
 Ember.LOG_BINDINGS = true
 
 App.Router.map ->
@@ -21,3 +23,24 @@ App.SheetRoute = Ember.Route.extend
 	setupController: (controller, model) ->
 		$.get "sheets/#{model.id}", (data) ->
 			controller.set 'content', data.sheet
+
+randomInt = (min, max) -> min + Math.floor(Math.random() * (max-min))
+d6 = -> randomInt(1, 7)
+_3d6CumProbs = [0.46, 1.85, 4.62, 9.25, 16.20, 25.92, 37.50, 50.00, 62.50, 74.07, 83.79, 90.74, 95.37, 98.14, 99.53, 100]
+
+App.SuccessRollView = Ember.View.extend
+	templateName: 'success-roll'
+	tagName: 'button'
+
+	successRate: (->
+			if 3 <= @target <= 18
+				_3d6CumProbs[@target - 3] + '%'
+		).property 'target'
+
+	successStyle: (->
+			if 3 <= @target <= 18
+				p = _3d6CumProbs[@target - 3]
+				'color: ' + (if p < 50 then 'red' else if p < 80 then 'orange' else 'green')
+		).property 'target'
+
+	click: -> window.alert(@target - d6() - d6() - d6())
