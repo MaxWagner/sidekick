@@ -10,5 +10,8 @@ def parse(lines):
 
 
 def generate(json):
-    # TODO implement this properly
-    return "DIE: 10\n"
+    maxlen = 0
+    for key in json:
+        if len(key) > maxlen:
+            maxlen = len(key)
+    return '\n'.join([key.upper() + ':' + (1+maxlen-len(key))*' ' + json[key] for key in json]) + '\n'
