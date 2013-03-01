@@ -50,3 +50,27 @@ Holdout                     A   IQ-1    10
 Electronics: Security       A   IQ-1    10
 Makeup                      E   IQ      11
 Stealth                     A   DX-1    11
+
+## Advantages
+
+Contacts: Underworld (reliab. 18) |9
+Signature Gear: Desert Eagle
+Ally: Chuck (Police Officer)
+Smooth Operator (lvl2)
+Claim to Hospitality
+Hard to Kill (lvl2)
+Luck
+
+## Disadvantages
+
+Addiction: Tobacco
+Bad Temper                          |12
+Callous
+Enemy: G-Man                        |6
+Nightmares (-1 FP, -1 on all rolls) |12
+Quirk: Coitophobia
+Quirk: Neutered
+Secret: Background as Prostitute
+Selfish                             |12
+Greed
+Colorblind
