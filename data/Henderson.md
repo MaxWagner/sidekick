@@ -5,3 +5,6 @@
 Kill everything      15
 Kill everything else      10
 
+## Languages
+
+Redneck
