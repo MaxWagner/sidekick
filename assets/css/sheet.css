@@ -1,0 +1,16 @@
+h1 { font-size: 20pt; }
+h2 { font-size: 13pt; }
+
+@media screen {
+    #wrapper {
+        width: 700px;
+        margin: auto;
+    }
+}
+
+@media handheld {
+    #wrapper {
+        h1 { font-size: 15pt; }
+        h2 { font-size: 13pt; }
+    }
+}

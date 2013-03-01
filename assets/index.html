@@ -19,16 +19,17 @@
 </head>
 <body>
 	<script type="text/x-handlebars" data-template-name="sheets">
-		<ul>
+		<ul id="sheets">
 			{{#each sheets}}
 				<li>{{#linkTo sheet this}}{{name}}{{/linkTo}}</li>
 			{{/each}}
 		</ul>
 	</script>
 	<script type="text/x-handlebars" data-template-name="sheet">
-		<h1>{{name}}</h1>
+		<div id="wrapper">
+		<h1 id="name">{{name}}</h1>
 		{{#with stats}}
-			<section>
+			<section id="stats">
 				<h2>Stats</h2>
 				<p>ST {{view App.SuccessRollView targetBinding=st}}</p>
 				<p>DX {{view App.SuccessRollView targetBinding=dx}}</p>
@@ -37,14 +38,14 @@
 			</section>
 		{{/with}}
 		{{#with languages}}
-			<section>
+			<section id="languages">
 				<h2>Languages</h2>
 				{{#each this}}
 				<p>{{this}}</p>
 				{{/each}}
 			</section>
 		{{/with}}
-			
+		</div>
 	</script>
 
 	<script type="text/x-handlebars" data-template-name="success-roll">
@@ -55,5 +56,6 @@
 	<script src="js/libs/handlebars-1.0.0.rc.3.js"></script>
 	<script src="js/libs/ember-1.0.0-rc.1.js"></script>
 	<script src="js/app.js"></script>
+
 </body>
 </html>
