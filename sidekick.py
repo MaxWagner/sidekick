@@ -18,6 +18,8 @@ log_level = 1
 @route('/sheets', method='GET')
 def get_listing():
     """Return a listing of available character sheets in JSON format"""
+    if log_level > 1:
+        print("::Received request: GET /sheets")
     update_character_sheets()
     return {"sheets": [{"id": id, "name": character_sheets[id]} for id in character_sheets]}
 
@@ -25,14 +27,16 @@ def get_listing():
 @route('/sheets/<id>', method='GET')
 def get_sheet(id=""):
     """Return a specific sheet in JSON format"""
+    if log_level > 1:
+        print("::Received request: GET /sheets/" + id)
     if id:
         # fetch the character sheet
         if id not in character_sheets:
-            if log_level > 1:
-                print("::character sheet not found. Updating...")
+            if log_level > 2:
+                print(":::character sheet not found. Updating...")
             update_character_sheets()
-            if log_level > 1:
-                print("::found {0} character sheets.".format(len(character_sheets)))
+            if log_level > 2:
+                print(":::found {0} character sheets.".format(len(character_sheets)))
         if id in character_sheets:
             # We need to wrap this into another object to prevent certain vulnerabilities
             return {"sheet": parse_sheet(id), "id": id}
@@ -57,9 +61,11 @@ def _get_raw_data():
 def put_sheet(id):
     """Parse and save a JSON object under the given id"""
     if id:
-        data = json.loads(_get_raw_data())
         if log_level > 1:
-            print("::received proper json data")
+            print("::Received request: PUT /sheets/" + id)
+        data = json.loads(_get_raw_data())
+        if log_level > 2:
+            print(":::received proper json data")
         if not data or data["id"] != id:
             abort(400, "Bad Request")
     dump_sheet(data)
@@ -68,21 +74,27 @@ def put_sheet(id):
 @route('/sheets/<id>', method='DELETE')
 def delete_sheet(id):
     """Delete a character sheet"""
+    if log_level > 1:
+        print("::Received request: DELETE /sheets/" + id)
     os.remove('data/' + id)
     del character_sheets[id]
     if log_level > 0:
-        print("::sheet deleted:", id)
+        print(":sheet deleted:", id)
 
 
 @route('/', method='GET')
 def get_root():
     """Serve the index.html"""
+    if log_level > 1:
+        print("::Received request: GET /")
     return get_asset("/index.html")
 
 
 @route('/<asset:path>', method='GET')
 def get_asset(asset=""):
     """Serve assets located in the "assets" folder by redirecting all requests there"""
+    if log_level > 1:
+        print("::Received request: GET /" + asset)
     try:
         return static_file(asset, "assets")
     except:
@@ -128,22 +140,22 @@ def parse_sheet(sheetname):
         return char
     except IOError:
         if log_level > 0:
-            print("::failed while trying to serve {0}. File not found.".format(sheetname))
+            print(":failed while trying to serve {0}. File not found.".format(sheetname))
         abort(404, "File not found")
 
 
 def get_func(module_name, func_name):
     try:
-        if log_level > 1:
-            print("::trying to find module", module_name)
+        if log_level > 2:
+            print(":::trying to find module", module_name)
         namespace = __import__("datahandlers." + module_name)
         module = getattr(namespace, module_name)
-        if log_level > 1:
-            print("::module found!")
+        if log_level > 2:
+            print(":::module found!")
         return getattr(module, func_name)
     except ImportError or AttributeError:
-        if log_level > 1:
-            print("::could not find specific implementation -- using generic one", file=sys.stderr)
+        if log_level > 2:
+            print(":::could not find specific implementation -- using generic one", file=sys.stderr)
         return getattr(datahandlers.generic, func_name)
 
 
@@ -165,12 +177,12 @@ def generate_sheet(data):
 
 def dump_sheet(data):
     sheet_text = generate_sheet(data)
-    if log_level > 1:
-        print("::sheet generated")
+    if log_level > 2:
+        print(":::sheet generated")
     with open("data/" + data["id"], 'w') as fd:
         fd.write(sheet_text)
         if log_level > 0:
-            print("::file", data["id"], "successfully written")
+            print(":file", data["id"], "successfully written")
 
 
 if __name__ == "__main__":
