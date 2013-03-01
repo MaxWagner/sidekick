@@ -39,7 +39,8 @@ def get_sheet(id=""):
                 print(":::found {0} character sheets.".format(len(character_sheets)))
         if id in character_sheets:
             # We need to wrap this into another object to prevent certain vulnerabilities
-            return {"sheet": parse_sheet(id), "id": id}
+            # the "system" key is hardcoded for now, this will change in the future
+            return {"system": "gurps", "sheet": parse_sheet(id), "id": id}
     else:
         return get_listing()
 
@@ -87,7 +88,7 @@ def get_root():
     """Serve the index.html"""
     if log_level > 1:
         print("::Received request: GET /")
-    return get_asset("/index.html")
+    return get_asset("index.html")
 
 
 @route('/<asset:path>', method='GET')
