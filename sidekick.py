@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from urllib.parse import urlparse
-from bottle import route, run, request, static_file
+from bottle import route, run, request, static_file, abort
 import sys
 import os
 import datahandlers.generic
@@ -114,7 +114,7 @@ def get_func(module_name, func_name):
         module = getattr(namespace, module_name)
         print("::module found!")
         return getattr(module, func_name)
-    except Exception:
+    except ImportError or AttributeError:
         print("::could not find specific implementation -- using generic one", file=sys.stderr)
         return getattr(datahandlers.generic, func_name)
 
