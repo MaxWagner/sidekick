@@ -131,7 +131,7 @@ def generate_sheet(data):
         if key != "name":
             sheet_text.append('## ' + capitalize_words(key) + '\n\n')
             gen_fn = get_func(key, "generate")
-            sheet_text.append(gen_fn(sheet[key]))
+            sheet_text.append(gen_fn(sheet[key]) + '\n')
     return ''.join(sheet_text)
 
 
