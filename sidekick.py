@@ -5,6 +5,10 @@ from bottle import route, run, request, static_file, abort
 import sys
 import os
 import datahandlers.generic
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 port = 8080
 character_sheets = []
@@ -36,11 +40,24 @@ def get_sheet(id=""):
         return get_listing()
 
 
+def _get_raw_data():
+    """Get raw request data from bottle"""
+    clen = request.content_length
+    if clen > request.MEMFILE_MAX:
+        abort(413, 'Request too large')
+    if clen < 0:
+        clen = request.MEMFILE_MAX + 1
+    data = request.body.read(clen)
+    if len(data) > request.MEMFILE_MAX: # Fail fast
+        abort(413, 'Request too large')
+    return data
+
+
 @route('/sheets/<id>', method='PUT')
 def put_sheet(id):
     """Parse and save a JSON object under the given id"""
     if id:
-        data = request.json
+        data = json.loads(_get_raw_data())
         if log_level > 1:
             print("::received proper json data")
         if not data or data["id"] != id:
@@ -158,4 +175,6 @@ def dump_sheet(data):
 
 if __name__ == "__main__":
     update_character_sheets()
-    run(host='0.0.0.0', port=port)
+    # since the default WSGI reference server is too slow when reading request data,
+    # we're using the faster cherrypy server
+    run(host='0.0.0.0', port=port, server='cherrypy')
