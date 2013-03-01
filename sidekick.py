@@ -8,6 +8,7 @@ import datahandlers.generic
 
 port = 8080
 character_sheets = []
+log_level = 1
 
 
 @route('/sheets', method='GET')
@@ -23,9 +24,11 @@ def get_sheet(id=""):
     if id:
         # fetch the character sheet
         if id not in character_sheets:
-            print("Character sheet not found. Updating...")
+            if log_level > 1:
+                print("::character sheet not found. Updating...")
             update_character_sheets()
-            print("Found {0} character sheets.".format(len(character_sheets)))
+            if log_level > 1:
+                print("::found {0} character sheets.".format(len(character_sheets)))
         if id in character_sheets:
             # We need to wrap this into another object to prevent certain vulnerabilities
             return {"sheet": parse_sheet(id), "id": id}
@@ -38,8 +41,9 @@ def put_sheet(id):
     """Parse and save a JSON object under the given id"""
     if id:
         data = request.json
-        print(data)
-        if not data:
+        if log_level > 1:
+            print("::received proper json data")
+        if not data or data["id"] != id:
             abort(400, "Bad Request")
     dump_sheet(data)
 
@@ -49,6 +53,8 @@ def delete_sheet(id):
     """Delete a character sheet"""
     os.remove('data/' + id)
     del character_sheets[id]
+    if log_level > 0:
+        print("::sheet deleted:", id)
 
 
 @route('/', method='GET')
@@ -104,18 +110,23 @@ def parse_sheet(sheetname):
                 char[header.lower()] = parse_fn(lines)
         return char
     except IOError:
+        if log_level > 0:
+            print("::failed while trying to serve {0}. File not found.".format(sheetname))
         abort(404, "File not found")
 
 
 def get_func(module_name, func_name):
     try:
-        print("::trying to find module", module_name)
+        if log_level > 1:
+            print("::trying to find module", module_name)
         namespace = __import__("datahandlers." + module_name)
         module = getattr(namespace, module_name)
-        print("::module found!")
+        if log_level > 1:
+            print("::module found!")
         return getattr(module, func_name)
     except ImportError or AttributeError:
-        print("::could not find specific implementation -- using generic one", file=sys.stderr)
+        if log_level > 1:
+            print("::could not find specific implementation -- using generic one", file=sys.stderr)
         return getattr(datahandlers.generic, func_name)
 
 
@@ -137,9 +148,12 @@ def generate_sheet(data):
 
 def dump_sheet(data):
     sheet_text = generate_sheet(data)
+    if log_level > 1:
+        print("::sheet generated")
     with open("data/" + data["id"], 'w') as fd:
         fd.write(sheet_text)
-        print("::file", data["id"], "successfully written")
+        if log_level > 0:
+            print("::file", data["id"], "successfully written")
 
 
 if __name__ == "__main__":
