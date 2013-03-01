@@ -12,7 +12,7 @@ except ImportError:
 
 port = 8080
 character_sheets = []
-log_level = 1
+log_level = 2
 
 
 @route('/sheets', method='GET')
