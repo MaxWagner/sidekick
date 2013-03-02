@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+"""parser/generator for a basic stat format along the following lines:
+IQ: 13
+It allows for arbitrary strings left and right of the colon and strips
+both sides of whitespace. The parser outputs a json dict with lowercase
+keys, e.g. {"iq":"13"}. The generated text is somewhat prettified by
+aligning the values"""
 
 
 def parse(lines):
