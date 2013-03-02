@@ -4,6 +4,7 @@ get caught by another file. It doesn't do any fancy stuff, it only
 returns strings. It does unpack lists and dicts when given json
 data, though."""
 
+
 def parse(lines):
     for i in range(len(lines)-1):
         lines[i] = lines[i].strip()
