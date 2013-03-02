@@ -190,4 +190,7 @@ if __name__ == "__main__":
     update_character_sheets()
     # since the default WSGI reference server is too slow when reading request data,
     # we're using the faster cherrypy server
-    run(host='0.0.0.0', port=port, server='cherrypy')
+    if len(sys.argv) > 1 and len(sys.argv[1]) > 9 and sys.argv[1].startswith("--server="):
+        run(host='0.0.0.0', port=port, server=sys.argv[1][9:])
+    else:
+        run(host='0.0.0.0', port=port)

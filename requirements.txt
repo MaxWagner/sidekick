@@ -1,3 +1,2 @@
-cherrypy>=3.2
 bottle
 
