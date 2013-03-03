@@ -7,7 +7,7 @@ Ember.LOG_BINDINGS = true
 
 App.Router.map ->
 	@resource 'sheets'
-	@resource 'sheet', path: '/sheets/:sheet_id'
+	@resource 'sheet', path: '/sheets/:system_id/:sheet_id'
 
 App.IndexRoute = Ember.Route.extend
 	redirect: -> @transitionTo 'sheets'
@@ -19,9 +19,14 @@ App.SheetsRoute = Ember.Route.extend
 			controller.set 'content', data
 
 App.SheetRoute = Ember.Route.extend
-	model: (params) -> id: params.sheet_id
+	model: (params) ->
+        id: params.sheet_id
+        system: params.system_id
+    serialize: (model) ->
+        sheet_id: model.id
+        system_id: model.system
 	setupController: (controller, model) ->
-        $.get "sheets/#{model.id}", (data) ->
+        $.get "sheets/#{model.system}/#{model.id}", (data) ->
             console.log data
             loadcss "sheet.css"
             controller.set 'content', data.sheet

@@ -155,32 +155,34 @@ def parse_sheet(system, sheetname):
 
 
 def get_func(module, func):
+    """gets a named function from one of the extension modules.
+    It always returns the most specific one, but supports at most
+    2 indirections in the module name (e.g. datahandlers.gurps.skills)"""
     if log_level > 2:
-        print(":::trying to find module", "datahandlers." + module)
-    prefixes = module.split('.')
+        print(":::trying to find module datahandlers." + module)
+    prefs = ["datahandlers"] + module.split('.')
     try:
-        for i in range(len(prefixes)-1,-1,-1):
-            try:
-                l = '.'.join(["datahandlers"] + prefixes[:i+1])
-                proto = [__import__(l)]
-                break
-            except ImportError:
-                pass
-        for pre in prefixes:
-            proto.append(getattr(proto[-1], pre))
+        mod = __import__(prefs[0] + '.' + prefs[1] + '.' + prefs[2])
+        mod = getattr(mod, prefs[1])
+        mod = getattr(mod, prefs[2])
+        func = getattr(mod, func)
+        if log_level > 2:
+            print(":::found applicable system-specific implementation")
+        return func
     except (ImportError, AttributeError):
-        pass
-    for i in range(len(proto)-1, 0, -1):
         try:
-            f = getattr(proto[i], func)
+            # try a general implementation
+            mod = __import__(prefs[0] + '.' + prefs[2])
+            mod = getattr(mod, prefs[2])
+            func = getattr(mod, func)
             if log_level > 2:
-                print(":::function found!")
-            return f
+                print(":::found applicable general implementation")
+            return func
         except (ImportError, AttributeError):
-            pass
-    if log_level > 2:
-        print(":::could not find specific implementation -- using generic one", file=sys.stderr)
-    return getattr(datahandlers.generic, func)
+            if log_level > 2:
+                print(":::could not find specific implementation; using fallback",
+                        file=sys.stderr)
+            return getattr(datahandlers.generic, func)
 
 
 def capitalize_words(string):
