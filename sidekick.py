@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from bottle import route, run, request, static_file, abort
 import sys
 import os
+import types
 import datahandlers.generic
 try:
     import ujson as json
@@ -11,7 +12,8 @@ except ImportError:
     import json
 
 port = 8080
-character_sheets = []
+character_sheets = {}
+# format of character_sheets {<system>:{<id>:<name>}}
 log_level = 2
 
 
@@ -21,28 +23,31 @@ def get_listing():
     if log_level > 1:
         print("::Received request: GET /sheets")
     update_character_sheets()
-    return {"sheets": [{"id": id, "name": character_sheets[id]} for id in character_sheets]}
+    res = []
+    for system in character_sheets:
+        for id in character_sheets[system]:
+            res.append({"id": id, "name": character_sheets[system][id], "system":system})
+    return {"sheets": res}
 
 
-@route('/sheets/<id>', method='GET')
-def get_sheet(id=""):
+@route('/sheets/<system>/<id>', method='GET')
+def get_sheet(system, id):
     """Return a specific sheet in JSON format"""
     if log_level > 1:
-        print("::Received request: GET /sheets/" + id)
-    if id:
+        print("::Received request: GET /sheets/" + system + '/' + id)
+    if character_sheets[system]:
         # fetch the character sheet
-        if id not in character_sheets:
+        if id not in character_sheets[system]:
             if log_level > 2:
                 print(":::character sheet not found. Updating...")
             update_character_sheets()
             if log_level > 2:
-                print(":::found {0} character sheets.".format(len(character_sheets)))
-        if id in character_sheets:
+                print(":::found {0} directories.".format(len(character_sheets)))
+        if id in character_sheets[system]:
             # We need to wrap this into another object to prevent certain vulnerabilities
-            # the "system" key is hardcoded for now, this will change in the future
-            return {"system": "gurps", "sheet": parse_sheet(id), "id": id}
+            return {"system": system, "sheet": parse_sheet(system, id), "id": id}
     else:
-        return get_listing()
+        abort(404, "Character sheet not found")
 
 
 def _get_raw_data():
@@ -58,27 +63,28 @@ def _get_raw_data():
     return data
 
 
-@route('/sheets/<id>', method='PUT')
-def put_sheet(id):
+@route('/sheets/<system>/<id>', method='PUT')
+def put_sheet(system, id):
     """Parse and save a JSON object under the given id"""
-    if id:
-        if log_level > 1:
-            print("::Received request: PUT /sheets/" + id)
-        data = json.loads(_get_raw_data())
-        if log_level > 2:
-            print(":::received proper json data")
-        if not data or data["id"] != id:
-            abort(400, "Bad Request")
+    if not os.path.exists('data/' + system):
+        os.path.makedirs('data/' + system)
+    if log_level > 1:
+        print("::Received request: PUT /sheets/" + system + '/' + id)
+    data = json.loads(_get_raw_data())
+    if log_level > 2:
+        print(":::received proper json data")
+    if not data or data["id"] != id:
+        abort(400, "Bad Request")
     dump_sheet(data)
 
 
-@route('/sheets/<id>', method='DELETE')
-def delete_sheet(id):
+@route('/sheets/<system>/<id>', method='DELETE')
+def delete_sheet(system, id):
     """Delete a character sheet"""
     if log_level > 1:
-        print("::Received request: DELETE /sheets/" + id)
-    os.remove('data/' + id)
-    del character_sheets[id]
+        print("::Received request: DELETE /sheets/" + system + '/' + id)
+    os.remove('data/' + system + '/' + id)
+    del character_sheets[system][id[id.index('/'):]]
     if log_level > 0:
         print(":sheet deleted:", id)
 
@@ -115,15 +121,18 @@ def update_character_sheets():
     global character_sheets
     dirlist = os.listdir('data')
     character_sheets = {}
-    for cs in dirlist:
-        with open('data/' + cs, 'r') as fd:
-            character_sheets[cs] = getline(fd).strip('# \n')
+    for system in dirlist:
+        if os.path.isdir('data/' + system):
+            character_sheets[system] = {}
+            for cs in os.listdir('data/' + system):
+                with open('data/' +system + '/' + cs, 'r') as fd:
+                    character_sheets[system][cs] = getline(fd).strip('# \n')
 
 
-def parse_sheet(sheetname):
+def parse_sheet(system, sheetname):
     char = {}
     try:
-        with open("data/" + sheetname, 'r') as fd:
+        with open("data/" + system + "/" + sheetname, 'r') as fd:
             line = getline(fd)
             char["name"] = line.strip("# \n")
             line = getline(fd)
@@ -136,7 +145,7 @@ def parse_sheet(sheetname):
                     line = getline(fd)
                 if len(lines) == 0:
                     break
-                parse_fn = get_func(header.lower(), "parse")
+                parse_fn = get_func(system + '.' + header.lower(), "parse")
                 char[header.lower()] = parse_fn(lines)
         return char
     except IOError:
@@ -145,19 +154,33 @@ def parse_sheet(sheetname):
         abort(404, "File not found")
 
 
-def get_func(module_name, func_name):
+def get_func(module, func):
+    if log_level > 2:
+        print(":::trying to find module", "datahandlers." + module)
+    prefixes = module.split('.')
     try:
-        if log_level > 2:
-            print(":::trying to find module", module_name)
-        namespace = __import__("datahandlers." + module_name)
-        module = getattr(namespace, module_name)
-        if log_level > 2:
-            print(":::module found!")
-        return getattr(module, func_name)
-    except ImportError or AttributeError:
-        if log_level > 2:
-            print(":::could not find specific implementation -- using generic one", file=sys.stderr)
-        return getattr(datahandlers.generic, func_name)
+        for i in range(len(prefixes)-1,-1,-1):
+            try:
+                l = '.'.join(["datahandlers"] + prefixes[:i+1])
+                proto = [__import__(l)]
+                break
+            except ImportError:
+                pass
+        for pre in prefixes:
+            proto.append(getattr(proto[-1], pre))
+    except (ImportError, AttributeError):
+        pass
+    for i in range(len(proto)-1, 0, -1):
+        try:
+            f = getattr(proto[i], func)
+            if log_level > 2:
+                print(":::function found!")
+            return f
+        except (ImportError, AttributeError):
+            pass
+    if log_level > 2:
+        print(":::could not find specific implementation -- using generic one", file=sys.stderr)
+    return getattr(datahandlers.generic, func)
 
 
 def capitalize_words(string):
@@ -180,7 +203,9 @@ def dump_sheet(data):
     sheet_text = generate_sheet(data)
     if log_level > 2:
         print(":::sheet generated")
-    with open("data/" + data["id"], 'w') as fd:
+    if not os.path.isdir("data/" + data["system"]):
+        os.path.makedirs("data/" + data["system"])
+    with open("data/" + data["system"] + '/' + data["id"], 'w') as fd:
         fd.write(sheet_text)
         if log_level > 0:
             print(":file", data["id"], "successfully written")
