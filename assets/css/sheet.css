@@ -1,5 +1,12 @@
 h1 { font-size: 20pt; }
 h2 { font-size: 13pt; }
+table td {
+    padding-right: 25px;
+}
+div {
+    /* I'd rather have this in an id selector, but oddly enough, that doesn't work*/
+    overflow-x: hidden;
+}
 
 @media screen {
     #wrapper {
@@ -10,6 +17,7 @@ h2 { font-size: 13pt; }
 
 @media handheld {
     #wrapper {
+        /* these things don't seem to get applied... */
         h1 { font-size: 15pt; }
         h2 { font-size: 13pt; }
     }

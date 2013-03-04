@@ -6,8 +6,8 @@ Different columns are separated by at least 2 spaces. Example:
 Acting               A  IQ    13
 Driving: Motorcycle  A  DX-1  11
 Will parse into:
-[{"name":"Acting","difficulty":"A","base stat":"IQ","points":"13"},
- {"name":"Driving: MOtorcycle","difficulty":"A","base stat":"DX-1","points":"11"}]"""
+[{"name":"Acting","difficulty":"A","base":"IQ","points":"13"},
+ {"name":"Driving: MOtorcycle","difficulty":"A","base":"DX-1","points":"11"}]"""
 
 
 def parse(lines):
@@ -27,13 +27,13 @@ def generate(json):
     statmax = 0
     for item in json:
         namemax = max(namemax, len(item["name"]))
-        statmax = max(statmax, len(item["base stat"]))
+        statmax = max(statmax, len(item["base"]))
         #diffmax = max(diffmax, len(item["difficulty"]))
     return '\n'.join([item["name"]
                      + (namemax - len(item["name"]) + 2)*' '
                      + item["difficulty"]
                      #+ ()*' '
                      + "  "
-                     + item["base stat"]
-                     + (statmax - len(item["base stat"]) + 2)*' '
+                     + item["base"]
+                     + (statmax - len(item["base"]) + 2)*' '
                      + item["points"] for item in json]) + '\n'
