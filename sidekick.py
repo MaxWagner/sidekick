@@ -72,7 +72,7 @@ def put_sheet(system, id):
     data = json.loads(_get_raw_data())
     if log_level > 2:
         print(":::received proper json data")
-    if not data or data["id"] != id:
+    if not data or data["id"] != id or data["system"] != system:
         abort(400, "Bad Request")
     dump_sheet(data)
 
