@@ -4,7 +4,6 @@ from urllib.parse import urlparse
 from bottle import route, run, request, static_file, abort
 import sys
 import os
-import types
 import datahandlers.generic
 try:
     import ujson as json
@@ -26,7 +25,7 @@ def get_listing():
     res = []
     for system in character_sheets:
         for id in character_sheets[system]:
-            res.append({"id": id, "name": character_sheets[system][id], "system":system})
+            res.append({"id": id, "name": character_sheets[system][id], "system": system})
     return {"sheets": res}
 
 
@@ -58,7 +57,7 @@ def _get_raw_data():
     if clen < 0:
         clen = request.MEMFILE_MAX + 1
     data = request.body.read(clen)
-    if len(data) > request.MEMFILE_MAX: # Fail fast
+    if len(data) > request.MEMFILE_MAX:
         abort(413, 'Request too large')
     return data
 
@@ -125,7 +124,7 @@ def update_character_sheets():
         if os.path.isdir('data/' + system):
             character_sheets[system] = {}
             for cs in os.listdir('data/' + system):
-                with open('data/' +system + '/' + cs, 'r') as fd:
+                with open('data/' + system + '/' + cs, 'r') as fd:
                     character_sheets[system][cs] = getline(fd).strip('# \n')
 
 
@@ -181,7 +180,7 @@ def get_func(module, func):
         except (ImportError, AttributeError):
             if log_level > 2:
                 print(":::could not find specific implementation; using fallback",
-                        file=sys.stderr)
+                      file=sys.stderr)
             return getattr(datahandlers.generic, func)
 
 

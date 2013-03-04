@@ -17,7 +17,7 @@ def parse(lines):
         items = [str.strip() for str in line.split('  ') if str]
         if len(items) < 4:
             items.extend((4 - len(items)) * '')
-        skills.append({"name": items[0], "difficulty": items[1], "base stat": items[2], "points": items[3]})
+        skills.append({"name": items[0], "difficulty": items[1], "base": items[2], "points": items[3]})
     return skills
 
 
