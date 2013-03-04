@@ -26,10 +26,10 @@ App.SheetRoute = Ember.Route.extend
 		sheet_id: model.id
 		system_id: model.system
 	setupController: (controller, model) ->
-        $.get "sheets/#{model.system}/#{model.id}", (data) ->
-            console.log data
-            loadcss "sheet.css"
-            controller.set 'content', data.sheet
+		$.get "sheets/#{model.system}/#{model.id}", (data) ->
+			console.log data
+			loadcss "sheet.css"
+			controller.set 'content', data.sheet
 
 randomInt = (min, max) -> min + Math.floor(Math.random() * (max-min))
 d6 = -> randomInt(1, 7)
@@ -53,8 +53,8 @@ App.SuccessRollView = Ember.View.extend
 	click: -> window.alert(@target - d6() - d6() - d6())
 
 loadcss = (css) ->
-    $("<link/>",
-        rel: "stylesheet",
-        type: "text/css",
-        href: "/css/" + css
-    ).appendTo "head"
+	$("<link/>",
+		rel: "stylesheet",
+		type: "text/css",
+		href: "/css/" + css
+	).appendTo "head"
