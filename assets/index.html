@@ -27,41 +27,25 @@
 	</script>
 	<script type="text/x-handlebars" data-template-name="sheet">
 		<div id="wrapper">
-		<h1 id="name">{{name}}</h1>
-		{{#with stats}}
-			<section id="stats">
-				<h2>Stats</h2>
-				<p>ST {{view App.SuccessRollView targetBinding=st}}</p>
-				<p>DX {{view App.SuccessRollView targetBinding=dx}}</p>
-				<p>IQ {{view App.SuccessRollView targetBinding=iq}}</p>
-				<p>HT {{view App.SuccessRollView targetBinding=ht}}</p>
-			</section>
-		{{/with}}
-		{{#with languages}}
-			<section id="languages">
-				<h2>Languages</h2>
-				{{#each this}}
-				<p>{{this}}</p>
-				{{/each}}
-			</section>
-		{{/with}}
-		{{#with skills}}
-			<section id="skills">
-				<h2>Skills</h2>
-				<table id="skill-list">
-					{{#each this}}
-						<tr>
-							<td>{{name}}</td>
-							<td>{{difficulty}}</td>
-							<td>{{base}}</td>
-							<td>{{points}}</td>
-						</tr>
-					{{/each}}
-				</table>
-			</section>
-		{{/with}}
+			<h1 id="name">{{sheet.name}}</h1>
+			{{#each category in categories}}
+				<section id="{{category}}">
+					{{view App.CategoryView categoryBinding=category}}
+				</section>
+			{{/each}}
 		</div>
 	</script>
+	<script type="text/x-handlebars" data-template-name="category-view">
+		<h2>{{category}}</h2>
+		{{#if view.isArray}}
+			{{#each this}}
+				<p>{{this}}</p>
+			{{/each}}
+		{{else}}
+			{{this}}
+		{{/if}}
+	</script>
+
 
 	<script type="text/x-handlebars" data-template-name="success-roll">
 		{{view.target}} - <span {{bindAttr style=view.successStyle}}>{{view.successRate}}</span>
