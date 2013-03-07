@@ -43,8 +43,7 @@ def get_sheet(system, id):
             if log_level > 2:
                 print(":::found {0} directories.".format(len(character_sheets)))
         if id in character_sheets[system]:
-            # We need to wrap this into another object to prevent certain vulnerabilities
-            return {"system": system, "sheet": parse_sheet(system, id), "id": id}
+            return parse_sheet(system, id)
     else:
         abort(404, "Character sheet not found")
 
@@ -129,7 +128,7 @@ def update_character_sheets():
 
 
 def parse_sheet(system, sheetname):
-    char = {}
+    char = { "id": sheetname, "system": system, "categories": [] }
     try:
         with open("data/" + system + "/" + sheetname, 'r') as fd:
             line = getline(fd)
@@ -145,7 +144,7 @@ def parse_sheet(system, sheetname):
                 if len(lines) == 0:
                     break
                 parse_fn = get_func(system + '.' + header.lower(), "parse")
-                char[header.lower()] = parse_fn(lines)
+                char["categories"].append({ "id": header.lower(), "name": header, "data": parse_fn(lines) })
         return char
     except IOError:
         if log_level > 0:
@@ -184,19 +183,12 @@ def get_func(module, func):
             return getattr(datahandlers.generic, func)
 
 
-def capitalize_words(string):
-    """Capitalize a string word by word"""
-    return ' '.join([s.capitalize() for s in string.split()])
-
-
-def generate_sheet(data):
-    sheet = data["sheet"]  # unwrap sheet
-    sheet_text = ["# " + capitalize_words(sheet["name"]) + '\n\n']
-    for key in sheet:
-        if key != "name":
-            sheet_text.append('## ' + capitalize_words(key) + '\n\n')
-            gen_fn = get_func(key, "generate")
-            sheet_text.append(gen_fn(sheet[key]) + '\n')
+def generate_sheet(sheet):
+    sheet_text = ["# " + sheet["name"] + '\n\n']
+    for cat in sheet["categories"]:
+        sheet_text.append('## ' + cat["name"] + '\n\n')
+        gen_fn = get_func(sheet["system"] + '.' + cat["id"], "generate")
+        sheet_text.append(gen_fn(cat["data"]) + '\n')
     return ''.join(sheet_text)
 
 

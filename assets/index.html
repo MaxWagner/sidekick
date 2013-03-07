@@ -27,22 +27,23 @@
 	</script>
 	<script type="text/x-handlebars" data-template-name="sheet">
 		<div id="wrapper">
-			<h1 id="name">{{sheet.name}}</h1>
-			{{#each category in categories}}
-				<section id="{{category}}">
-					{{view App.CategoryView categoryBinding=category}}
+			<h1 id="name">{{name}}</h1>
+			{{log categories}}
+			{{#each categories}}
+				<section id="{{name}}">
+					{{view App.CategoryView}}
 				</section>
 			{{/each}}
 		</div>
 	</script>
 	<script type="text/x-handlebars" data-template-name="category-view">
-		<h2>{{category}}</h2>
+		<h2>{{name}}</h2>
 		{{#if view.isArray}}
-			{{#each this}}
+			{{#each data}}
 				<p>{{this}}</p>
 			{{/each}}
 		{{else}}
-			{{this}}
+			{{data}}
 		{{/if}}
 	</script>
 

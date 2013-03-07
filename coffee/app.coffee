@@ -30,25 +30,23 @@ App.SheetRoute = Ember.Route.extend
 			loadcss "sheet.css"
 			controller.set 'content', data
 
-App.SheetController = Ember.ObjectController.extend
-	categories: (-> (key for own key, _ of @content.sheet)).property 'content'
-
 App.CategoryView = Ember.View.extend
 	setRealTemplate: (template) ->
-		@set 'context', @get "context.sheet.#{@category}"
 		@set 'template', template
 		@rerender()
 
 	template: (->
-			if @get 'context'
-				$.ajax
-					url: "datahandlers/#{@get 'context.system'}/#{@category}.handlebars"
-					success: (template) => @setRealTemplate(Ember.Handlebars.compile template)
-					error: () => @setRealTemplate Ember.TEMPLATES['category-view']
+			$.ajax
+				url: "datahandlers/#{@get 'parentView.context.system'}/#{@get 'context.id'}.handlebars"
+				success: (template) =>
+					@set 'context', @get 'context.data'
+					@setRealTemplate(Ember.Handlebars.compile template)
+				error: () =>
+					@setRealTemplate Ember.TEMPLATES['category-view']
 			(-> "Loading...")
 		).property 'context'
 
-	isArray: (-> Ember.Array.detect(@get 'context')).property 'context'
+	isArray: (-> Ember.Array.detect(@get 'context.data')).property 'context'
 
 randomInt = (min, max) -> min + Math.floor(Math.random() * (max-min))
 d6 = -> randomInt(1, 7)
