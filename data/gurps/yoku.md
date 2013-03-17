@@ -1,5 +1,14 @@
 # Yoku Mieko
 
+## Misc
+
+Ht: 1,70m
+Wt: 67kg
+Age: 21
+
+Point total: 130
+Unspent: 0
+
 ## Stats
 
 ST: 10
@@ -25,19 +34,19 @@ Bastard
 
 ## Skills
 
-Acting                      A   IQ      13+2
+Acting                      A   IQ      11+2
 Carousing                   E   HT      0+2
-Detect Lies                 H   PER     14+2
+Detect Lies                 H   PER     12+2
 Diplomacy                   H   IQ      0+2
-Fast-talk                   A   IQ      13+2
-Intimidation                A   WILL    17+2
+Fast-talk                   A   IQ      11+2
+Intimidation                A   WILL    15+2
 Leadership                  A   IQ      0+2
 Panhandling                 E   IQ      0+2
 Politics                    A   IQ      0+2
 Public Speaking             A   IQ      0+2
-Savoir-Faire: Mafia         E   IQ+2    15+2
-Sex Appeal                  A   HT-1+1  12+2
-Streetwise                  A   IQ+2    15+2
+Savoir-Faire: Mafia         E   IQ+2    13+2
+Sex Appeal                  A   HT-1    10+2
+Streetwise                  A   IQ+2    13+2
 Area Knowledge              E   IQ      11
 Computer Operation          E   IQ      11
 Current Affairs: Headline   E   IQ      11
