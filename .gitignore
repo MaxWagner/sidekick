@@ -1,6 +1,7 @@
-## CoffeeScript
-
+# CoffeeScript
 assets/js/*.js
+
+assets/datahandlers/
 
 ## Python
 
