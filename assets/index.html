@@ -47,9 +47,13 @@
 		{{/if}}
 	</script>
 
-
 	<script type="text/x-handlebars" data-template-name="success-roll">
 		{{view.target}} - <span {{bindAttr style=view.successStyle}}>{{view.successRate}}</span>
+	</script>
+	<script type="text/x-handlebars" data-template-name="roll-result">
+		<div class="popup">
+			<span {{bindAttr style=view.successStyle}}>{{view.rollString}}</span>
+		</div>
 	</script>
 
 	<script src="js/libs/jquery-1.9.1.min.js"></script>

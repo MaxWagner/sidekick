@@ -67,7 +67,40 @@ App.SuccessRollView = Ember.View.extend
 				'color: ' + (if p < 50 then 'red' else if p < 80 then 'orange' else 'green')
 		).property 'target'
 
-	click: -> window.alert(@target - d6() - d6() - d6())
+	click: -> popup App.RollResultView.create(roll: d6() + d6() + d6() - @target)
+
+popup = (view) ->
+	mask = $('<div></div>')
+		.css
+			position: 'absolute'
+			top: 0
+			'z-index': 100
+			width: '100%'
+			height: $(document).height()
+			'text-align': 'center'
+		.click(-> mask.remove())
+		.appendTo $('body')
+
+	box = $('<div></div>')
+		.css
+			position: 'fixed'
+			'z-index': 101
+			top: ($(window).height()) / 2
+			width: '100%'
+		.click(-> mask.remove())
+		.appendTo mask
+
+	view.appendTo box
+
+App.RollResultView = Ember.View.extend
+	templateName: 'roll-result'
+
+	rollString: (->
+			if @roll <= 0 then @roll else '+' + @roll
+		).property 'roll'
+	successStyle: (->
+			'color: ' + (if @roll <= 0 then 'green' else 'red')
+		).property 'roll'
 
 loadcss = (css) ->
 	$("<link/>",

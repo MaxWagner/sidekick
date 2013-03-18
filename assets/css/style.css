@@ -86,8 +86,17 @@ a:hover { color: #036; }
     \\ ========================================== //
 */
 
+.popup {
+	padding: 30px;
+	min-width: 100px;
+	display: inline-block;
+	margin: 20px;
 
-
+	background-color: white;
+	box-shadow: 5px 5px 30px #DDD;
+	border-radius: 15px;
+	font-size: 20pt;
+}
 
 
 
