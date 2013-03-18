@@ -1,3 +1,5 @@
+<script type="application/javascript">
+</script>
 <h2>Skills</h2>
 <table id="skill-list">
 	{{#each this}}
@@ -5,7 +7,7 @@
 			<td>{{name}}</td>
 			<td>{{difficulty}}</td>
 			<td>{{base}}</td>
-			<td>{{points}}</td>
+			<td>{{view App.SuccessRollView targetBinding=points}}</td>
 		</tr>
 	{{/each}}
 </table>
