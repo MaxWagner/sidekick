@@ -1,6 +1,6 @@
 randomInt = (min, max) -> min + Math.floor(Math.random() * (max-min))
 d6 = -> randomInt(1, 7)
-_3d6CumProbs = [0.46, 1.85, 4.62, 9.25, 16.20, 25.92, 37.50, 50.00, 62.50, 74.07, 83.79, 90.74, 95.37, 98.14, 99.53, 100]
+_3d6CumProbs = [0.46, 1.85, 4.62, 9.25, 16.20, 25.92, 37.50, 50.00, 62.50, 74.07, 83.79, 90.74, 95.37, 98.14, 98.14, 98.14]
 
 evalModifiers = (str) ->
 	if 0 <= str.indexOf '+'
@@ -29,14 +29,21 @@ Gurps.SuccessRollView = Ember.View.extend
 				'color: ' + (if p < 50 then 'red' else if p < 80 then 'orange' else 'green')
 		).property 'target'
 
-	click: -> App.popup Gurps.RollResultView.create(roll: d6() + d6() + d6() - evalModifiers(@target))
+	click: -> App.popup Gurps.RollResultView.create(roll: d6() + d6() + d6(), target: evalModifiers(@target))
 
 Gurps.RollResultView = Ember.View.extend
 	templateName: 'roll-result'
 
 	rollString: (->
-			if @roll <= 0 then @roll else '+' + @roll
+			if @roll >= 17
+				@roll
+			else
+				diff = @roll - @target
+				if diff > 0
+					diff = '+' + diff
+				diff
 		).property 'roll'
+
 	successStyle: (->
-			'color: ' + (if @roll <= 0 then 'green' else 'red')
+			'color: ' + (if @roll < 17 and @roll <= @target then 'green' else 'red')
 		).property 'roll'
